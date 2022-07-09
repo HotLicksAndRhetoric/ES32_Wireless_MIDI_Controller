@@ -1,0 +1,74 @@
+#include <Arduino.h>
+#include <BLEMidi.h>                                                                                                                                               
+
+#define SWITCH1 4
+#define SWITCH2 5
+#define SWITCH3 13
+#define SWITCH4 14
+#define SWITCH5 15
+#define SWITCH6 16
+#define SWITCH7 17
+#define SWITCH8 18
+#define SWITCH9 19
+#define SWITCH10 21
+#define SWITCH11 22
+#define SWITCH12 23
+#define SWITCH13 25
+#define BOUNCEDELAY 25
+
+int Transpose = 0; //Not implemented yet
+int switches[13] = {SWITCH1, SWITCH2, SWITCH3, SWITCH4, SWITCH5, SWITCH6, SWITCH7, SWITCH8, SWITCH9, SWITCH10, SWITCH11, SWITCH12, SWITCH13};
+int switchState[13] = {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH};
+int TriggeredNote[13] = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60}; MIDI notes
+int currentSwitch = 0;
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Initializing bluetooth");
+  BLEMidiServer.begin("BG MIDI Controller"); //Name the controller whatever you like
+  Serial.println("Waiting for connections...");
+  //BLEMidiServer.enableDebugging();  // Uncomment if you want to see some debugging output from the library (not much for the server class...)
+  for ( currentSwitch = 0; currentSwitch < 13; currentSwitch++ )
+  {
+    pinMode(switches[currentSwitch], INPUT_PULLUP);        // Set GPIO pins for Input
+  }
+}
+
+void loop()
+{
+if (BLEMidiServer.isConnected())
+  {
+  for ( currentSwitch = 0; currentSwitch < 13; currentSwitch++ )
+    {
+      if (digitalRead(switches[currentSwitch]) != switchState[currentSwitch] )
+      { 
+        Serial.println("Current Switch = "); //comment these print statements out when working
+        Serial.println(currentSwitch);
+        Serial.println("Name = ");
+        Serial.println(switches[currentSwitch]);
+        Serial.println("Stored State = ");
+        Serial.println(switchState[currentSwitch]);
+        if ( switchState[currentSwitch] == LOW )                        // Note is playing
+        {
+          Serial.println ("Note is playing:");
+          Serial.println (TriggeredNote[currentSwitch]);
+          BLEMidiServer.noteOff(0, TriggeredNote[currentSwitch], 127);  // Turn off note
+          Serial.println("Note was turned off.");
+          switchState[currentSwitch] = HIGH ;                           // Change status of note to HIGH (off)
+          Serial.println("New State = " && switchState[currentSwitch]);
+          delay( BOUNCEDELAY );
+        }
+        else                                                            // Note is not playing
+        {
+          Serial.println ("Note is not playing:");
+          Serial.println (TriggeredNote[currentSwitch]);
+          BLEMidiServer.noteOn(0, TriggeredNote[currentSwitch], 127);   // Turn on note
+          Serial.println("Note was turned on.");
+          switchState[currentSwitch] = LOW;                             // Change status of note to LOW (off)
+          Serial.println("New State = " && switchState[currentSwitch]);
+          delay( BOUNCEDELAY );
+        }
+      } 
+    }
+  }
+}
