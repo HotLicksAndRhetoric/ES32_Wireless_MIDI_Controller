@@ -19,7 +19,7 @@
 int Transpose = 0; //Not implemented yet
 int switches[13] = {SWITCH1, SWITCH2, SWITCH3, SWITCH4, SWITCH5, SWITCH6, SWITCH7, SWITCH8, SWITCH9, SWITCH10, SWITCH11, SWITCH12, SWITCH13};
 int switchState[13] = {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH};
-int TriggeredNote[13] = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60}; MIDI notes
+int TriggeredNote[13] = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60}; //MIDI notes
 int currentSwitch = 0;
 
 void setup() {
